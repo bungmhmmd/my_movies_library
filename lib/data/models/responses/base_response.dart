@@ -15,7 +15,7 @@ class BaseResponse {
 
   factory BaseResponse.fromJson(Map<String, dynamic> json) => BaseResponse(
     page: json["page"],
-    next: json["next"],
+    next: json["next"] ?? '',
     entries: json["entries"],
     movieResponses: List<MovieResponse>.from(
       json["results"].map((x) => MovieResponse.fromJson(x)),

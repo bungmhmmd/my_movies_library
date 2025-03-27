@@ -18,4 +18,18 @@ class MoviesRepository {
       rethrow;
     }
   }
+
+  Future<BaseResponse> searchTitlesMovies(String title) async {
+    try {
+      String formattedTitle = title.replaceAll(' ', '%20');
+      final BaseResponse baseResponse = await moviesService.searchTitlesMovies(
+        formattedTitle,
+      );
+      return baseResponse;
+    } on MoviesException catch (e) {
+      throw MoviesException(e.message);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

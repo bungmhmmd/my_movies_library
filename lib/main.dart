@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_movies_library/core/services/movies_service.dart';
 import 'package:my_movies_library/data/repositories/movies_repository.dart';
 import 'package:my_movies_library/presentation/blocs/movie_bloc/movies_bloc.dart';
+import 'package:my_movies_library/presentation/blocs/search_movies_bloc/search_movies_bloc.dart';
 import 'package:my_movies_library/presentation/pages/home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,6 +24,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create:
               (context) => MoviesBloc(
+                moviesRepository: context.read<MoviesRepository>(),
+              ),
+        ),
+        BlocProvider(
+          create:
+              (context) => SearchMoviesBloc(
                 moviesRepository: context.read<MoviesRepository>(),
               ),
         ),

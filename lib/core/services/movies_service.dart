@@ -38,4 +38,40 @@ class MoviesService {
       rethrow;
     }
   }
+
+  Future<BaseResponse> searchTitlesMovies(String title) async {
+    final String searchUrl = '$moviesSearchTitlesUrl/$title';
+    final uri = Uri(
+      scheme: 'https',
+      host: baseUrl,
+      path: searchUrl,
+      queryParameters: {'sort': 'year.decr'},
+    );
+    print(uri);
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          'x-rapidapi-key': xRapidAPIKey,
+          'x-rapidapi-host': xRapidAPIHost,
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(httpErrorHandler(response));
+      }
+      dynamic body = jsonDecode(response.body);
+      print(body);
+      if (body['results'] == null) {
+        throw MoviesException(body['error']);
+      }
+      if (body['results'].isEmpty) {
+        throw MoviesException('No movies found with the title $title');
+      }
+      print('data found');
+      return BaseResponse.fromJson(body);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

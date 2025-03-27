@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_movies_library/core/constants/font_size.dart';
 import 'package:my_movies_library/core/utils/show_snack_bar.dart';
 import 'package:my_movies_library/data/models/responses/movie_response.dart';
-import 'package:my_movies_library/presentation/blocs/movie_bloc/movies_bloc.dart';
+import 'package:my_movies_library/presentation/blocs/search_movies_bloc/search_movies_bloc.dart';
 import 'package:my_movies_library/presentation/widgets/movie_card_widget.dart';
 import 'package:my_movies_library/theme_data.dart';
 
@@ -16,6 +16,14 @@ class FilterPage extends StatefulWidget {
 
 class _FilterPageState extends State<FilterPage> {
   final formKey = GlobalKey<FormState>();
+  final titleController = TextEditingController();
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,6 +68,8 @@ class _FilterPageState extends State<FilterPage> {
                   ),
                   SizedBox(height: 8),
                   TextFormField(
+                    controller: titleController,
+                    style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Search by title',
                       hintStyle: TextStyle(
@@ -80,33 +90,56 @@ class _FilterPageState extends State<FilterPage> {
                     },
                   ),
                   SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity, // Set the button to take full width
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          print('submit');
-                        }
-                      },
-                      child: Text('Submit'),
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(borderRadiusSize),
+                      color: primaryColor,
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(borderRadiusSize),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(borderRadiusSize),
+                        onTap: () {
+                          if (formKey.currentState!.validate()) {
+                            context.read<SearchMoviesBloc>().add(
+                              SearchMoviesTitleEvent(
+                                title: titleController.text,
+                              ),
+                            );
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Center(
+                            child: Text(
+                              'Submit',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
+
                   SizedBox(height: 8),
                 ],
               ),
             ),
           ),
           Expanded(
-            child: BlocConsumer<MoviesBloc, MoviesState>(
+            child: BlocConsumer<SearchMoviesBloc, SearchMoviesState>(
               listener: (context, state) {
-                if (state.status == MoviesStatus.failure) {
+                if (state.status == SearchMoviesStatus.failure) {
                   showSnackbar(context, state.message, Colors.red);
                 }
               },
               builder: (context, state) {
-                if (state.status == MoviesStatus.loading) {
+                if (state.status == SearchMoviesStatus.loading) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (state.status == MoviesStatus.success) {
+                } else if (state.status == SearchMoviesStatus.success) {
                   List<MovieResponse> movies = state.movies;
                   return GridView.builder(
                     gridDelegate:
